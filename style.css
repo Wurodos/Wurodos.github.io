@@ -8,18 +8,52 @@ body{
     color: white;
 }
 
-h1{
+#mainTitle{
     text-align: center;
     font-size: 4em;
     animation-name: fade-in;
     animation-duration: 4s;
 }
 
-a {color:white } 
-a:visited { color:white; }
-a:hover { color:rgb(255, 69, 100); }
+#visitCount{
+    text-align: center;
+    color: grey;
+}
+
+a {color:rgb(255, 69, 100); } 
+a:visited { color:rgb(255, 69, 100); }
+a:hover { color:white;}
 
 .linkContainer{
     display: block;
     text-align: center;
+}
+
+.horizontalContainer{
+    display: flex;
+    flex-direction: row;
+}
+
+.contentCard{
+    width: 50%;
+    font-size: 2em;
+    background-color: rgb(37, 11, 61);
+    border-style: double;
+    border-color: white;
+    margin-left: 20px;
+    margin-right: 20px;
+    text-align: center;
+}
+
+.grid {
+    display: grid;
+    gap: 1px;
+    grid-template-columns: repeat(3, 1fr);
+    margin-left: 40%;
+    width: 20%;
+}
+
+.cell {
+    padding: 50px;
+    background-color: #ccc;
 }
