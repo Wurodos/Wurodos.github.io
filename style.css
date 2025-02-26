@@ -20,6 +20,11 @@ body{
     color: grey;
 }
 
+#turnText{
+    text-align: center;
+}
+
+
 a {color:rgb(255, 69, 100); } 
 a:visited { color:rgb(255, 69, 100); }
 a:hover { color:white;}
@@ -47,13 +52,9 @@ a:hover { color:white;}
 
 .grid {
     display: grid;
-    gap: 1px;
+    gap: 0px;
     grid-template-columns: repeat(3, 1fr);
-    margin-left: 40%;
-    width: 20%;
-}
-
-.cell {
-    padding: 50px;
-    background-color: #ccc;
+    margin-left: auto;
+    margin-right: auto;
+    width: 384px;
 }
