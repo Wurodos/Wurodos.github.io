@@ -11,16 +11,36 @@
         <button id="cardBtn">Карта</button>
         <button id="rollBtn">Кубик</button>
         <button id="defenceBtn">Укрепления</button>
+        <button id="mineBtn">Мины</button>
         <button id="resWestBtn">Ресурсы западу</button>
         <button id="resSeaBtn">Ресурсы морю</button>
         <button id="resEastBtn">Ресурсы востоку</button>
-        <label id="statusLabel">Плейсхолдер!</label>
+        <label id="statusLabel">Статус</label>
+        <label id="moraleLabel">Мораль: 0</label>
     </header>
     <h1 id="mainTitle">Османский Закат</h1>
     <img src="sprite/gameboard.png" id="board">
     <script type="module" src="logic.js"></script>
+    <img id = "die" src="sprite/die/1.png">
     <div id="eventCard">
-        Deck
+        Колода<div class="horizontalContainer">
+            <img src="sprite/advanced.png" class="halfsize">
+        </div><div class="horizontalContainer">
+            <img src="sprite/retreat.png" class="halfsize">
+        </div><label class="smalltext">
+        </label>
     </div>
+
+
+    <div class="horizontalContainer">
+        <img src="sprite/theaters.png">
+        <img src="sprite/fortitude.png">
+        <label id="west-res">
+            0
+        </label>
+        <label id="sea-res">0</label>
+        <label id="east-res">0</label>
+    </div>
+    
 </body>
 </html>

@@ -14,6 +14,12 @@ label{
     text-shadow: -1px -1px 4px #000, 1px -1px 4px #000, -1px 1px 4px #000, 1px 1px 4px #000
 }
 
+.shadowText{
+    color:white;
+    font-size: 48px;
+    text-shadow: -1px -1px 4px #000, 1px -1px 4px #000, -1px 1px 4px #000, 1px 1px 4px #000
+}
+
 #mainTitle{
     text-align: center;
     font-size: 4em;
@@ -65,6 +71,15 @@ a:hover { color:white;}
     width: 384px;
 }
 
+.halfsize {
+    height: 50px;
+    width: auto;
+}
+
+.smalltext{
+    font-size: 14px;
+}
+
 #mainBar {
     position: fixed;
     z-index: 1;
@@ -79,7 +94,7 @@ a:hover { color:white;}
 #eventCard {
     position: absolute;
     display: block;
-    background-color: crimson;
+    background-color: lightsteelblue;
     top:750px;
     left:67px;
     width: 200px;
@@ -90,10 +105,37 @@ a:hover { color:white;}
     text-shadow: -1px -1px 4px #000, 1px -1px 4px #000, -1px 1px 4px #000, 1px 1px 4px #000
 }
 
+#die {
+    position: absolute;
+    top: 600px;
+    left: 67px;
+}
+
 #statusLabel{
     font-size:24px;
 }
 
+#moraleLabel{
+    position: absolute;
+    font-size:28px;
+    right: 30px;
+}
+
 #board {
     width: 100%;
+}
+
+#west-res{
+    position: absolute;
+    left: 100px;
+}
+
+#sea-res{
+    position: absolute;
+    left: 300px;
+}
+
+#east-res{
+    position: absolute;
+    left: 500px;
 }
