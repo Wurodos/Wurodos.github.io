@@ -51,6 +51,10 @@ a:hover { color:white;}
     flex-direction: row;
 }
 
+.absolutepos{
+    position: absolute;
+}
+
 .contentCard{
     width: 50%;
     font-size: 2em;
@@ -122,20 +126,34 @@ a:hover { color:white;}
 }
 
 #board {
-    width: 100%;
+    width: 1520px;
+    height: 855px;
+}
+
+.dontshow {
+    display: none;
 }
 
 #west-res{
+    color:white;
+    font-size: 48px;
+    text-shadow: -1px -1px 4px #000, 1px -1px 4px #000, -1px 1px 4px #000, 1px 1px 4px #000;
     position: absolute;
     left: 100px;
 }
 
 #sea-res{
+    color:white;
+    font-size: 48px;
+    text-shadow: -1px -1px 4px #000, 1px -1px 4px #000, -1px 1px 4px #000, 1px 1px 4px #000;
     position: absolute;
     left: 300px;
 }
 
 #east-res{
+    color:white;
+    font-size: 48px;
+    text-shadow: -1px -1px 4px #000, 1px -1px 4px #000, -1px 1px 4px #000, 1px 1px 4px #000;
     position: absolute;
     left: 500px;
 }

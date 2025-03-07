@@ -15,9 +15,28 @@
         <button id="resWestBtn">Ресурсы западу</button>
         <button id="resSeaBtn">Ресурсы морю</button>
         <button id="resEastBtn">Ресурсы востоку</button>
+        <button id="intelBtn" class="dontshow">Бюро разведки</button>
+
         <label id="statusLabel">Статус</label>
         <label id="moraleLabel">Мораль: 0</label>
+
+        <button id="turkey" class="dontshow">Турция</button>
+        <button id="persia" class="dontshow">Персия</button>
+        <button id="afghanistan" class="dontshow">Афганистан</button>
+        <button id="india" class="dontshow">Индия</button>
+
+        <button id="caucasus" class="dontshow">Кавказ</button>
+        <button id="mesopotamia" class="dontshow">Месоп.</button>
+        <button id="sinai" class="dontshow">Синай</button>
+        <button id="arab" class="dontshow">Арабы</button>
+        <button id="galipoli" class="dontshow">Галиполи</button>
+        <button id="salonika" class="dontshow">Салоника</button>
+
+        <button id="yes" class="dontshow">Да</button>
+        <button id="no" class="dontshow">Нет</button>
     </header>
+
+
     <h1 id="mainTitle">Османский Закат</h1>
     <img src="sprite/gameboard.png" id="board">
     <script type="module" src="logic.js"></script>
@@ -35,11 +54,15 @@
     <div class="horizontalContainer">
         <img src="sprite/theaters.png">
         <img src="sprite/fortitude.png">
-        <label id="west-res">
-            0
-        </label>
-        <label id="sea-res">0</label>
-        <label id="east-res">0</label>
+        <div id="west-res">0<br>
+            <button id="west-btn">Изъять</button>
+        </div>
+        <div id="sea-res">0<br>
+            <button id="sea-btn">Изъять</button></div>
+        <div id="east-res">0<br>
+            <button id="east-btn">Изъять</button></div>
+        <img src="sprite/intelligence.png">
+        <img id="intel" src="sprite/intelligence_counter.png", class="absolutepos">
     </div>
     
 </body>

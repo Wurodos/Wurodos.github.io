@@ -1,4 +1,4 @@
-import { sunriseDeck } from "./cards.js";
+import { sunriseDeck, middayDeck } from "./cards.js";
 
 function random(min,max) {
     return Math.floor((Math.random())*(max-min+1))+min;
@@ -12,6 +12,7 @@ const mineBtn  = document.getElementById("mineBtn");
 const resWestBtn  = document.getElementById("resWestBtn");
 const resSeaBtn   = document.getElementById("resSeaBtn");
 const resEastBtn  = document.getElementById("resEastBtn");
+const intelBtn = document.getElementById("intelBtn");
 
 const moraleLabel = document.getElementById("moraleLabel")
 
@@ -23,6 +24,17 @@ const westResLabel = document.getElementById("west-res");
 const eastResLabel = document.getElementById("east-res");
 const seaResLabel = document.getElementById("sea-res");
 
+const westBtn = document.getElementById("west-btn");
+const eastBtn = document.getElementById("east-btn");
+const seaBtn = document.getElementById("sea-btn");
+
+const turkeyBtn = document.getElementById("turkey");
+const indiaBtn = document.getElementById("india");
+const afghanistanBtn = document.getElementById("afghanistan");
+const persiaBtn = document.getElementById("persia");
+
+
+
 let resourceLeft = 6
 let morale = 0
 
@@ -30,8 +42,25 @@ let card
 
 cardBtn.onclick = drawcard
 resWestBtn.onclick = addWestResource
+westBtn.onclick = removeWestResource
 resEastBtn.onclick = addEastResource
+eastBtn.onclick = removeEastResource
 resSeaBtn.onclick = addSeaResource
+seaBtn.onclick = removeSeaResource
+
+intelBtn.onclick = () => {
+    turkeyBtn.style.display = 'inline-block'
+    indiaBtn.style.display = 'inline-block'
+    afghanistanBtn.style.display = 'inline-block'
+    persiaBtn.style.display = 'inline-block'
+    gameState.isActionPhase = false
+    disableall()
+}
+
+turkeyBtn.onclick = ()=>{moveIntel("turkey"); gameState.isActionPhase = true; gameState.hideExtraBtns(); spendAction();}
+indiaBtn.onclick = ()=>{moveIntel("india"); gameState.isActionPhase = true; gameState.hideExtraBtns(); spendAction();}
+afghanistanBtn.onclick = ()=>{moveIntel("afghanistan"); gameState.isActionPhase = true; gameState.hideExtraBtns(); spendAction();}
+persiaBtn.onclick = ()=>{moveIntel("persia"); gameState.isActionPhase = true; gameState.hideExtraBtns(); spendAction();}
 
 defenceBtn.onclick = () => {addDefence(3)}
 mineBtn.onclick = () => {addMine()}
@@ -70,6 +99,7 @@ function disableall()
  resWestBtn  .disabled= true
  resSeaBtn   .disabled= true
  resEastBtn  .disabled= true
+ intelBtn    .disabled= true
 }
 
 function enableall()
@@ -79,6 +109,7 @@ function enableall()
  resWestBtn  .disabled= false
  resSeaBtn   .disabled= false
  resEastBtn  .disabled= false
+ intelBtn    .disabled= false
 }
 
 function printMousePos(event)
@@ -106,6 +137,15 @@ class Track
         this.imgpath = "sprite/"+name+".png";
         this.currentPos = 0;
         this.modifier = 0;
+        this.button = document.getElementById(name)
+    }
+
+    provisional()
+    {
+        this.imgpath= "sprite/caucasus_provisional.png";
+        this.provisional = true;
+        this.counterDiv.childNodes[0].src = this.imgpath;
+        this.setStrength(this.strength);
     }
 
     advance()
@@ -113,13 +153,23 @@ class Track
         if (!gameState.pipelineBuilt && this.name == "sinai" && this.currentPos < 2)
             if (rollDie() >= this.strength)
                 return;
+        if (gameState.gaza && this.name == "sinai" && this.currentPos == 1)
+        {
+            if (rollDie() >= this.strength)
+                return;
+            else gameState.gaza--;
+        }
+
+
         this.currentPos += 1;
         this.counterDiv.style.top = `${this.spaces[this.currentPos].y}px`;
         this.counterDiv.style.left = `${this.spaces[this.currentPos].x}px`;
         
         if (this.spaces[this.currentPos].vp)
         {
-            changeMorale(-1)
+            if (this.name == "sinai" && this.currentPos == 4 && allTracks.arab.currentPos >= 4) {}
+            else if (this.name == "arab" && this.currentPos == 4 && allTracks.sinai.currentPos >= 4) {}
+            else changeMorale(-1)
         }
         if (this.currentPos >= this.spaces.length)
         {
@@ -136,7 +186,9 @@ class Track
         if (this.currentPos == 0) return;
         if (this.spaces[this.currentPos].vp)
         {
-            changeMorale(+1)
+            if (this.name == "sinai" && this.currentPos == 4 && allTracks.arab.currentPos >= 4) {}
+            else if (this.name == "arab" && this.currentPos == 4 && allTracks.sinai.currentPos >= 4) {}
+            else changeMorale(+1)
         }
         this.currentPos -= 1
         this.counterDiv.style.top = `${this.spaces[this.currentPos].y}px`;
@@ -145,6 +197,7 @@ class Track
 
     setStrength(newStr)
     {
+        if (this.provisional) newStr--;
         this.strength = newStr
         this.counterDiv.childNodes[1].textContent = newStr
     }
@@ -204,26 +257,42 @@ const gameState =
     westRes: 0,
     eastRes: 0,
     seaRes: 0,
+    bureau: "turkey",
 
     forceCaucasus : false,
     noCaucasus: false,
     noMesopotamia: false,
     noSinai: false,
+    lose: () => {
+        window.alert("Османская Империя пала...");
+    },
     pipelineBuilt: false,
-    intelligenceAllowed : false,
+    intelligenceAllowed : () => {intelBtn.style.display = 'inline-block';},
     statusLabel: statusLabel,
     cardBtn: cardBtn,
     rollBtn: rollBtn,
+    defBtn: defenceBtn,
+    mineBtn: mineBtn,
     showTrack: showTrack,
     roll: rollDie,
     changeMorale:changeMorale,
     allTracks:allTracks,
     addMine:addMine,
     removeTrack:removeTrack,
+    spendAction: spendAction,
+    yesBtn : document.getElementById("yes"),
+    noBtn : document.getElementById("no"),
     isActionPhase: false,
 
     shuffleIn: (newDeck) => {gameState.deck.push(...newDeck); shuffle(gameState.deck);},
-    breakSedulbahir: () => {document.getElementById("def0").textContent = "0";}
+    breakSedulbahir: () => {document.getElementById("def0").textContent = "0";},
+
+    hideExtraBtns(){
+        turkeyBtn.style.display = 'none';
+        indiaBtn.style.display = 'none';
+        persiaBtn.style.display = 'none';
+        afghanistanBtn.style.display = 'none';
+    }
 }
 
 
@@ -237,6 +306,8 @@ function start()
 
    addDefence(4)
    addDefence(2)
+
+   moveIntel("turkey")
 
    gameState.deck.push(...sunriseDeck)
    shuffle(gameState.deck)
@@ -363,6 +434,7 @@ function drawcard()
     cardBtn.textContent = "Продолжить"
     cardBtn.onclick = playerTurn
     cardBtn.disabled = false
+    gameState.actionsLeft = card.actions
 
     if (card.effect)
     {
@@ -376,7 +448,6 @@ function playerTurn()
     cardBtn.disabled = true
     cardBtn.onclick = drawcard
     cardBtn.textContent = "Карта"
-    gameState.actionsLeft = card.actions
     gameState.isActionPhase = true;
 
     if (gameState.defences.length < 6)
@@ -392,19 +463,24 @@ function playerTurn()
             if (gameState.eastRes < 2)resEastBtn.disabled = false;
         }
     }
-
-   
+    intelBtn.disabled = false;
 
     if (gameState.forceCaucasus)
     {
         disableall()
         statusLabel.textContent = `Атакуйте Кавказ`
-    } else statusLabel.textContent = `\tДелайте ${card.actions} действий`
+    } else statusLabel.textContent = `\tДелайте ${gameState.actionsLeft} действий`
+
+    if (gameState.actionsLeft <= 0)
+        spendAction();
 }
 
-function spendAction()
+function spendAction(no)
 {
-    gameState.actionsLeft--;
+    if (no)
+        gameState.actionsLeft++;
+    else gameState.actionsLeft--;
+
     enableall()
     if (gameState.actionsLeft <= 0)
     {
@@ -429,9 +505,6 @@ function spendAction()
         statusLabel.textContent = `Атакуйте Кавказ`
     }
     else statusLabel.textContent = `\tДелайте ${gameState.actionsLeft} действий`
-    
-
-    
 }
 
 function startOffensive(track)
@@ -477,31 +550,56 @@ function addWestResource()
 {
     resourceLeft--;
     gameState.westRes++;
-    westResLabel.textContent = gameState.westRes
+    westResLabel.childNodes[0].textContent = gameState.westRes
     if (resourceLeft == 0 || gameState.westRes == 2) resWestBtn.disabled = true
     spendAction()
     spendAction()
+}
+
+function removeWestResource()
+{
+    if (gameState.westRes == 0) return;
+    gameState.westRes--;
+    westResLabel.childNodes[0].textContent = gameState.westRes
+    spendAction(+1)
 }
 
 function addSeaResource()
 {
     resourceLeft--;
     gameState.seaRes++;
-    seaResLabel.textContent = gameState.seaRes
+    seaResLabel.childNodes[0].textContent = gameState.seaRes
     if (resourceLeft == 0 || gameState.seaRes == 2) resSeaBtn.disabled = true
     spendAction()
     spendAction()
+}
+
+function removeEastResource()
+{
+    if (gameState.eastRes == 0) return;
+    gameState.eastRes--;
+    eastResLabel.childNodes[0].textContent = gameState.eastRes
+    spendAction(+1)
 }
 
 function addEastResource()
 {
     resourceLeft--;
     gameState.eastRes++;
-    eastResLabel.textContent = gameState.eastRes
+    eastResLabel.childNodes[0].textContent = gameState.eastRes
     if (resourceLeft == 0 || gameState.eastRes == 2) resEastBtn.disabled = true
     spendAction()
     spendAction()
 }
+
+function removeSeaResource()
+{
+    if (gameState.seaRes == 0) return;
+    gameState.seaRes--;
+    seaResLabel.childNodes[0].textContent = gameState.seaRes
+    spendAction(+1)
+}
+
 
 const defencePos = 
 [
@@ -560,6 +658,23 @@ function addMine()
     document.body.appendChild(newDefence)
 
     spendAction()
+}
+
+const intelPos = {
+    turkey : {x:1230,y:1052},
+    afghanistan : {x:1388,y:1054},
+    india : {x:1393,y:1202} ,
+    persia : {x:1248,y:1207},
+}
+
+const intelImg = document.getElementById("intel")
+
+function moveIntel(to)
+{
+    console.log(to)
+    intelImg.style.top = `${intelPos[to].y}px` 
+    intelImg.style.left = `${intelPos[to].x}px`  
+    gameState.bureau = to
 }
 
 
