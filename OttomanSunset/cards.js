@@ -12,21 +12,20 @@ class Card
 
 export const duskDeck = [
     new Card("King Constantine Flees Greece", "", 3, ["caucasus", "galipoli", "salonika"], [], (gs)=>{modifierAgainst(gs, "salonika", -1)}), // -1 to salonika
-    new Card("SANDSTORMS", "", 1, ["arab"], []), // TODO die 1-3: retreat mes, 4-6: sinai, no offence vs them
+    new Card("SANDSTORMS", "", 1, ["arab"], [], sandstorms), // die 1-3: retreat mes, 4-6: sinai, no offence vs them
     new Card("Kaiserschlacht!", "", 4, ["caucasus", "mesopotamia"], []), // TODO kaiserchlacht enabled, +1 vs all incl. KS
     new Card("U-Boat Campaign", "", 3, ["arab", "mesopotamia", "sinai"], [],(gs)=>{battle(gs, 'sea', 4);}), // sea [4]
     new Card("Lawrence Stirs the Arabs", "", 1, ["caucasus"], [],(gs)=>{setStrength(gs, "arab", 3);}), // arab = 3
-    new Card("Galipoli Evacuation", "", 3, ["mesopotamia", "sinai"], []), // TODO remove galipoli, if on-map salonika=3
+    new Card("Galipoli Evacuation", "", 3, ["mesopotamia", "sinai"], [], (gs)=>{gs.removeTrack("galipoli"); setStrength(gs, "salonika", 3);}), // remove galipoli, if on-map salonika=3
     new Card("Victorio Venero", "", 3, ["arab", "galipoli", "salonika"], [],(gs)=>{battle(gs, 'east', 4);}), // eastern [4]
     new Card("Hoffman Offensive", "", 3, ["arab", "sinai"], [],(gs)=>{modifierAgainst(gs, "caucasus")}), // +1 vs caucasus
     new Card("Army of Islam", "", 2, ["arab", "mesopotamia", "sinai"], [],(gs)=>{modifierAll(gs)}), // +1 vs all
     new Card("War Weariness", "", 0, [], []), // TODO war weariness (-1 to foreign)
                                             // die roll: 1-sinai, 2-mesopotamia, 3/4-arab, 5/6-galipoli+salonika
-
     new Card("Balfour Declaration", "", 2, ["arab", "galipoli", "mesopotamia"], [],(gs)=>{modifierAgainst(gs, "sinai")}), // +1 vs sinai
     new Card("Allenby Takes the Helm", "", 2, ["caucasus", "arab"], [],(gs)=>{setStrength(gs, "sinai", 4);}), // sinai = 4
     new Card("Dunsterforce", "", 2, ["arab", "sinai"], []), //  TODO skip a turn, or -1 morale
-    new Card("Bolshevik Revolution", "", 2, ["arab", "salonika", "sinai"], []), // TODO remove caucasus
+    new Card("Bolshevik Revolution", "", 2, ["arab", "salonika", "sinai"], [], (gs)=>{gs.removeTrack("caucasus")}), // remove caucasus
 ]
 
 export const middayDeck = [
@@ -43,16 +42,15 @@ export const middayDeck = [
     new Card("Brusilov Offensive","", 1, ["salonika"],[],(gs)=>{battle(gs, 'east', 3);}), // eastern [3]
     new Card("Jutland","", 2, ["galipoli", "salonika", "mesopotamia"], [],(gs)=>{battle(gs, 'sea', 5);}), // sea [5]
     new Card("Forcing the Narrows","", 2, ["arab", "caucasus"]), // TODO resolve FTN
-
     new Card("Fortification of Gaza-Beersheba line","", 2, ["arab", "salonika", "mesopotamia"]), // TODO can skip a turn to build if sinai < 2
-    new Card("Mesopotamian Siege","", 1, ["caucasus", "salonika"]), // TODO +morale, mesopotamia back to 0 space, but str=4
+    new Card("Mesopotamian Siege","", 1, ["caucasus", "salonika"], [], siegeOfKut), // +morale, mesopotamia back to 0 space, but str=4
     new Card("Armenian Massacres","", 3, ["galipoli", "salonika", "sinai"], [], blockCaucasus), // no caucasus for turn
     new Card("The Somme","", 1, ["galipoli", "salonika"], [], (gs)=>{battle(gs, 'west', 3);}), // western [3]
     new Card("German U-Boats","", 2, ["caucasus", "sinai"]), // TODO No FTN, +1 vs galipoli, +2 vs salonika
     new Card("Italy Joins the War","", 2, ["arab", "salonika"],[],(gs)=>{battle(gs, 'east', 3);}), // eastern [3]
     new Card("Suvla Landing","", 2, ["galipoli", "caucasus", "sinai"],[],(gs)=>{setStrength(gs, "galipoli", 3);}), // if on map galipoli = 3
 
-    new Card("Sinai Pipeline","", 1, ["galipoli", "salonika"]) // TODO pipeline built, arab 2 on map, shuffle dusk
+    new Card("Sinai Pipeline","", 1, ["galipoli", "salonika"],[],buildPipeline) // pipeline built, arab 2 on map, shuffle dusk
 ]
 
 export const sunriseDeck = [
@@ -70,7 +68,6 @@ export const sunriseDeck = [
     new Card("Turkish Minelaying","Бесплатные Мины. +1 против Месопотамии", 2, ["arab", "caucasus"],[], (gs)=>{gs.addMine(); modifierAgainst(gs, "mesopotamia")}), // free minefield, +1 to rolls vs Mesopotamia 
     new Card("Jihad Declared!","Замешайте Полдень. +1 ко всем броскам", 3, ["mesopotamia", "caucasus", "sinai"],[], (gs)=>{gs.shuffleIn(middayDeck); modifierAll(gs);}) // shuffle mid-day, +1 to all rolls
 ]
-
 
 
 function enver(gamestate)
@@ -148,4 +145,39 @@ function modifierAll(gamestate)
     gamestate.allTracks.mesopotamia.modifier=1
     gamestate.allTracks.salonika.modifier=1
     gamestate.allTracks.sinai.modifier=1
+}
+
+function sandstorms(gamestate)
+{
+    gamestate.statusLabel.textContent = `Песчаные бури. Бросьте куб.`
+    gamestate.cardBtn.disabled = true
+    gamestate.rollBtn.disabled = false
+    gamestate.rollBtn.onclick = () => {
+        if (gamestate.roll() < 4) {
+            gamestate.statusLabel.textContent = `Никаких атак в Месопотамию.`
+            gamestate.allTracks.mesopotamia.retreat()
+            gamestate.noMesopotamia = true
+        } else {
+            gamestate.statusLabel.textContent = `Никаких атак в Синай.`
+            gamestate.allTracks.sinai.retreat()
+            gamestate.noSinai = true
+        }
+        rollBtn.disabled = true;
+        gamestate.cardBtn.disabled = false;
+    }
+}
+
+function siegeOfKut(gamestate)
+{
+    gamestate.changeMorale(+1);
+    for (let i = 0; i < 6; i++)
+        gamestate.allTracks.mesopotamia.retreat();
+    gamestate.allTracks.mesopotamia.setStrength(4);
+}
+
+function buildPipeline(gamestate)
+{
+    gamestate.pipelineBuilt = true;
+    gamestate.shuffleIn(duskDeck);
+    gamestate.showTrack("arab")
 }

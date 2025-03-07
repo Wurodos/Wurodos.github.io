@@ -110,7 +110,7 @@ class Track
 
     advance()
     {
-        if (this.name == "sinai" && this.currentPos < 2)
+        if (!gameState.pipelineBuilt && this.name == "sinai" && this.currentPos < 2)
             if (rollDie() >= this.strength)
                 return;
         this.currentPos += 1;
@@ -207,6 +207,9 @@ const gameState =
 
     forceCaucasus : false,
     noCaucasus: false,
+    noMesopotamia: false,
+    noSinai: false,
+    pipelineBuilt: false,
     intelligenceAllowed : false,
     statusLabel: statusLabel,
     cardBtn: cardBtn,
@@ -216,6 +219,7 @@ const gameState =
     changeMorale:changeMorale,
     allTracks:allTracks,
     addMine:addMine,
+    removeTrack:removeTrack,
     isActionPhase: false,
 
     shuffleIn: (newDeck) => {gameState.deck.push(...newDeck); shuffle(gameState.deck);},
@@ -247,6 +251,9 @@ function changeMorale(delta)
 
 function showTrack(name)
 {
+    if (allTracks[name].counterDiv)
+        return;
+
     let counter = document.createElement('div')
     counter.style.position = "absolute"
     counter.style.top = `${allTracks[name].spaces[0].y}px`
@@ -270,6 +277,13 @@ function showTrack(name)
     allTracks[name].counterDiv = counter
 }
 
+function removeTrack(name)
+{
+    if (allTracks[name].counterDiv)
+        document.getElementsByTagName("body")[0].removeChild(allTracks[name].counterDiv)
+    allTracks[name].counterDiv = null
+}
+
 
 
 function gameloop()
@@ -277,6 +291,8 @@ function gameloop()
     // reset flags
     gameState.forceCaucasus = false;
     gameState.noCaucasus = false;
+    gameState.noMesopotamia = false;
+    gameState.noSinai = false;
 
     allTracks.arab.modifier=0
     allTracks.caucasus.modifier=0
@@ -425,6 +441,10 @@ function startOffensive(track)
     if (gameState.forceCaucasus && track.name != "caucasus")
         return; 
     if (gameState.noCaucasus && track.name == "caucasus")
+        return;
+    if (gameState.noMesopotamia && track.name == "mesopotamia")
+        return;
+    if (gameState.noSinai && track.name == "sinai")
         return;
     
     
