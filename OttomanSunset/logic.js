@@ -14,6 +14,11 @@ const resSeaBtn   = document.getElementById("resSeaBtn");
 const resEastBtn  = document.getElementById("resEastBtn");
 const intelBtn = document.getElementById("intelBtn");
 
+const yesBtn= document.getElementById("yes");
+const noBtn = document.getElementById("no");
+
+const yildrimLabel = document.getElementById("yildrim")
+
 const moraleLabel = document.getElementById("moraleLabel")
 
 const eventCardDiv = document.getElementById("eventCard");
@@ -148,16 +153,24 @@ class Track
         this.setStrength(this.strength);
     }
 
-    advance()
+    advance(forced)
     {
-        if (!gameState.pipelineBuilt && this.name == "sinai" && this.currentPos < 2)
-            if (rollDie() >= this.strength)
-                return;
-        if (gameState.gaza && this.name == "sinai" && this.currentPos == 1)
+        if (!forced)
         {
-            if (rollDie() >= this.strength)
+            if (!gameState.pipelineBuilt && this.name == "sinai" && this.currentPos < 2)
+                if (rollDie() >= this.strength)
+                    return;
+            if (gameState.gaza && this.name == "sinai" && this.currentPos == 1)
+            {
+                if (rollDie() >= this.strength)
+                    return;
+                else gameState.gaza--;
+            }
+            if ((this.name == "sinai" || this.name == "mesopotamia") && gameState.yildrim > 0)
+            {
+                this.justmoved = true;
                 return;
-            else gameState.gaza--;
+            }
         }
 
 
@@ -259,10 +272,18 @@ const gameState =
     seaRes: 0,
     bureau: "turkey",
 
+    yildrim:0,
+    setYildrim(n)
+    {
+        this.yildrim = n;
+        yildrimLabel.textContent = `${this.yildrim} Yildrim`;
+    },
+
     forceCaucasus : false,
     noCaucasus: false,
     noMesopotamia: false,
     noSinai: false,
+    kaiser: false,
     lose: () => {
         window.alert("Османская Империя пала...");
     },
@@ -280,8 +301,8 @@ const gameState =
     addMine:addMine,
     removeTrack:removeTrack,
     spendAction: spendAction,
-    yesBtn : document.getElementById("yes"),
-    noBtn : document.getElementById("no"),
+    yesBtn : yesBtn,
+    noBtn : noBtn,
     isActionPhase: false,
 
     shuffleIn: (newDeck) => {gameState.deck.push(...newDeck); shuffle(gameState.deck);},
@@ -365,6 +386,9 @@ function gameloop()
     gameState.noMesopotamia = false;
     gameState.noSinai = false;
 
+    allTracks.mesopotamia.justmoved = false;
+    allTracks.sinai.justmoved = false;
+
     allTracks.arab.modifier=0
     allTracks.caucasus.modifier=0
     allTracks.galipoli.modifier=0
@@ -436,10 +460,49 @@ function drawcard()
     cardBtn.disabled = false
     gameState.actionsLeft = card.actions
 
-    if (card.effect)
-    {
-        card.effect(gameState)
-    }
+
+    console.log(allTracks.mesopotamia.justmoved)
+    console.log(allTracks.sinai.justmoved)
+    console.log(!allTracks.mesopotamia.justmoved && !allTracks.sinai.justmoved)
+
+
+
+        if (!allTracks.mesopotamia.justmoved && !allTracks.sinai.justmoved)
+        {
+            if (card.effect) card.effect(gameState)
+        }
+        else {
+            // yildrim
+            cardBtn.disabled = true;
+            let curry = () => {cardBtn.disabled = false; if (card.effect) card.effect(gameState);}
+            if (allTracks.mesopotamia.justmoved)
+            {
+                let snapshot = curry;
+                curry = () => { yesnoPrompt("Остановить Месопотамию? ", ()=>{
+                    if (gameState.yildrim > 0)
+                        gameState.setYildrim(gameState.yildrim-1)
+                    else allTracks.mesopotamia.advance(true)
+                    snapshot();
+                }, () => {
+                    allTracks.mesopotamia.advance(true)
+                    snapshot();
+                }) }
+            }
+            if (allTracks.sinai.justmoved)
+            {
+                let snapshot = curry;
+                curry = () => { yesnoPrompt("Остановить Синай? ", ()=>{
+                    if (gameState.yildrim > 0)
+                        gameState.setYildrim(gameState.yildrim-1)
+                    else allTracks.sinai.advance(true)
+                    snapshot();
+                }, () => {
+                    allTracks.sinai.advance(true)
+                    snapshot();
+                }) }
+            }
+            curry();
+        }
     
 }
 
@@ -677,5 +740,27 @@ function moveIntel(to)
     gameState.bureau = to
 }
 
+function yesnoPrompt(prompt, yesFun, noFun)
+{
+    cardBtn.disabled = true;
+
+    statusLabel.textContent = prompt;
+
+    yesBtn.style.display = 'inline-block'
+    yesBtn.onclick = () => {
+        yesFun();
+        cardBtn.disabled = false
+        yesBtn.style.display = 'none'
+        noBtn.style.display = 'none'
+    }
+
+    noBtn.style.display = 'inline-block'
+    noBtn.onclick = () => {
+        noFun();
+        cardBtn.disabled = false
+        yesBtn.style.display = 'none'
+        noBtn.style.display = 'none'
+    }
+}
 
 start();

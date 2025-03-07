@@ -13,7 +13,7 @@ class Card
 export const duskDeck = [
     new Card("King Constantine Flees Greece", "-1 против Салоники", 3, ["caucasus", "galipoli", "salonika"], [], (gs)=>{modifierAgainst(gs, "salonika", -1)}), // -1 to salonika
     new Card("SANDSTORMS", "Кубик 1-3: Месоп. отступает, 4-6: Синай отступает, никакой атаки против них", 1, ["arab"], [], sandstorms), // die 1-3: retreat mes, 4-6: sinai, no offence vs them
-    new Card("Kaiserschlacht!", "Кайзершляхт. +1 против всех", 4, ["caucasus", "mesopotamia"], []), // TODO kaiserchlacht enabled, +1 vs all incl. KS
+    new Card("Kaiserschlacht!", "Кайзершляхт. +1 против всех", 4, ["caucasus", "mesopotamia"], [], (gs)=>{gs.kaiser = true; modifierAll(gs)}), // TODO kaiserchlacht enabled, +1 vs all incl. KS
     new Card("U-Boat Campaign", "Битва на море (4)", 3, ["arab", "mesopotamia", "sinai"], [],(gs)=>{battle(gs, 'sea', 4);}), // sea [4]
     new Card("Lawrence Stirs the Arabs", "Сила Арабов=3", 1, ["caucasus"], [],(gs)=>{setStrength(gs, "arab", 3);}), // arab = 3
     new Card("Galipoli Evacuation", "Галиполи эвакуирует, сила Салоники=3", 3, ["mesopotamia", "sinai"], [], (gs)=>{gs.removeTrack("galipoli"); setStrength(gs, "salonika", 3);}), // remove galipoli, if on-map salonika=3
@@ -29,7 +29,7 @@ export const duskDeck = [
 ]
 
 export const middayDeck = [
-    new Card("Yildrim", "3 раза можете остановить Месоп./Синай", 1, ["caucasus", "salonika"], []), // TODO 3 tokens to stop mesopotamia/sinai
+    new Card("Yildrim", "3 раза можете остановить Месоп./Синай", 1, ["caucasus", "salonika"], [],(gs)=>{gs.setYildrim(3);}), // 3 tokens to stop mesopotamia/sinai
     new Card("Verdun", "Битва на западе (4)", 1, ["caucasus", "mesopotamia"], [], (gs)=>{battle(gs, 'west', 4);}), // western [4]
     new Card("Arab Revolt","Арабы прибывают", 2, ["mesopotamia", "sinai"], [], (gs)=>{gs.showTrack("arab");}), // arab 2
     new Card("Erzurum Offensive","Нельзя атаковать Кавказ", 2, ["caucasus"], [], blockCaucasus), // no caucasus for turn
