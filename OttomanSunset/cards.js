@@ -13,7 +13,7 @@ class Card
 export const duskDeck = [
     new Card("King Constantine Flees Greece", "-1 против Салоники", 3, ["caucasus", "galipoli", "salonika"], [], (gs)=>{modifierAgainst(gs, "salonika", -1)}), // -1 to salonika
     new Card("SANDSTORMS", "Кубик 1-3: Месоп. отступает, 4-6: Синай отступает, никакой атаки против них", 1, ["arab"], [], sandstorms), // die 1-3: retreat mes, 4-6: sinai, no offence vs them
-    new Card("Kaiserschlacht!", "Кайзершляхт. +1 против всех", 4, ["caucasus", "mesopotamia"], [], (gs)=>{gs.kaiser = true; modifierAll(gs)}), // TODO kaiserchlacht enabled, +1 vs all incl. KS
+    new Card("Kaiserschlacht!", "Кайзершляхт. +1 против всех", 4, ["caucasus", "mesopotamia"], [], (gs)=>{gs.kaiser = true; modifierAll(gs)}), // TEST kaiserchlacht enabled, +1 vs all incl. KS
     new Card("U-Boat Campaign", "Битва на море (4)", 3, ["arab", "mesopotamia", "sinai"], [],(gs)=>{battle(gs, 'sea', 4);}), // sea [4]
     new Card("Lawrence Stirs the Arabs", "Сила Арабов=3", 1, ["caucasus"], [],(gs)=>{setStrength(gs, "arab", 3);}), // arab = 3
     new Card("Galipoli Evacuation", "Галиполи эвакуирует, сила Салоники=3", 3, ["mesopotamia", "sinai"], [], (gs)=>{gs.removeTrack("galipoli"); setStrength(gs, "salonika", 3);}), // remove galipoli, if on-map salonika=3
@@ -121,12 +121,18 @@ function coup(gamestate, name)
     }
 }
 
-function battle(gamestate, theater, strength)
+export function battle(gamestate, theater, strength, ksId)
 {
-    gamestate.statusLabel.textContent = `Битва. Бросьте куб.`
+    if (ksId)
+        gamestate.statusLabel.textContent = `Кайзершляхт! Бросьте куб.`
+    else
+        gamestate.statusLabel.textContent = `Битва. Бросьте куб.`
     gamestate.cardBtn.disabled = true
     gamestate.rollBtn.disabled = false
     gamestate.rollBtn.onclick = () => {
+        rollBtn.disabled = true;
+        gamestate.cardBtn.disabled = false;
+
         let roll = gamestate.roll() + gamestate[`${theater}Res`]
         if (gamestate.warweariness) roll--;
 
@@ -134,13 +140,22 @@ function battle(gamestate, theater, strength)
         {
             gamestate.statusLabel.textContent = `Победа, +1 мораль`
             gamestate.changeMorale(+1) 
+            if (ksId)
+                gamestate.ksResults[ksId] = 1;
+        }
+        else if (roll == strength)
+        {
+            gamestate.statusLabel.textContent = `Пат.`
+            if (ksId)
+                gamestate.ksResults[ksId] = 0;
         }
         else {
             gamestate.statusLabel.textContent = `Поражение, -1 мораль`
             gamestate.changeMorale(-1)
+            if (ksId)
+                gamestate.ksResults[ksId] = -1;
         }
-        rollBtn.disabled = true;
-        gamestate.cardBtn.disabled = false;
+        
     }
 }
 

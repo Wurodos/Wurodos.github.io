@@ -1,4 +1,4 @@
-import { sunriseDeck, middayDeck } from "./cards.js";
+import { sunriseDeck, middayDeck, duskDeck, battle } from "./cards.js";
 
 function random(min,max) {
     return Math.floor((Math.random())*(max-min+1))+min;
@@ -279,11 +279,17 @@ const gameState =
         yildrimLabel.textContent = `${this.yildrim} Yildrim`;
     },
 
+    // kaiserchlacht
+    kaiser: false,
+    ksProgress: 0,
+    ksBattles: [3,3,4,4,5,5],
+    ksResults: [0,0,0,0,0,0], // how much morale was gained in a particular battle
+
     forceCaucasus : false,
     noCaucasus: false,
     noMesopotamia: false,
     noSinai: false,
-    kaiser: false,
+    
     lose: () => {
         window.alert("Османская Империя пала...");
     },
@@ -331,7 +337,9 @@ function start()
    moveIntel("turkey")
 
    gameState.deck.push(...sunriseDeck)
+   
    shuffle(gameState.deck)
+   gameState.deck.push(duskDeck[2])
    gameloop()
 }
 
@@ -396,10 +404,35 @@ function gameloop()
     allTracks.salonika.modifier=0
     allTracks.sinai.modifier=0
 
+    
 
-    statusLabel.textContent = "\tТяните карту"
-    disableall()
-    cardBtn.disabled = false
+    if (!gameState.kaiser)
+    {
+        statusLabel.textContent = "\tТяните карту"
+            disableall()
+            cardBtn.disabled = false
+    } else {
+        // KAISERSCHLACHT 
+        // It's done at the start instead of end but I don't think it matters in any way
+        // 3,3,4,4,5,5 in that order
+        // after done with these 6, reroll random battle
+        disableall()
+
+        if (gameState.ksProgress < 6)
+        {
+            battle(gameState, "west", gameState.ksBattles[gameState.ksProgress], gameState.ksProgress);
+            gameState.ksProgress++;
+        }
+        else
+        {
+            let randomId = rollDie() - 1
+            changeMorale(-gameState.ksResults[randomId])
+            gameState.ksResults[randomId] = 
+                battle(gameState, "west", gameState.ksBattles[randomId], randomId);
+        }
+
+
+    }
 }
 
 function drawcard()
@@ -557,6 +590,11 @@ function spendAction(no)
         resSeaBtn.disabled = true; 
         resEastBtn.disabled = true;
     }
+    if (gameState.westRes == 2) resWestBtn.disabled = true;
+    if (gameState.eastRes == 2) resEastBtn.disabled = true; 
+    if (gameState.seaRes == 2) resSeaBtn.disabled = true;  
+
+
     if (gameState.defences.length == 6)
         defenceBtn.disabled = true
     if (gameState.mines.length == 2)
@@ -587,7 +625,7 @@ function startOffensive(track)
     statusLabel.textContent = `\tКидайте куб`
     disableall()
     rollBtn.disabled = false
-    rollBtn.onclick = () => {doOffensive(track); rollBtn.disabled = true}
+    rollBtn.onclick = () => {rollBtn.disabled = true; doOffensive(track); }
 }
 
 function doOffensive(track)
