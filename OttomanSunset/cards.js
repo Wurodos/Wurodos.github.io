@@ -124,7 +124,13 @@ function coup(gamestate, name)
 export function battle(gamestate, theater, strength, ksId)
 {
     if (ksId)
-        gamestate.statusLabel.textContent = `Кайзершляхт! Бросьте куб.`
+    {
+        if (gamestate.ksResults[ksId] > 0)
+            gamestate.statusLabel.textContent = `Антанта контратакует, -1 мораль. Бросьте куб.`
+        else if (gamestate.ksResults[ksId] < 0)
+            gamestate.statusLabel.textContent = `Германия контратакует, +1 мораль. Бросьте куб.`
+        else gamestate.statusLabel.textContent = `Кайзершляхт! Бросьте куб.`
+    }
     else
         gamestate.statusLabel.textContent = `Битва. Бросьте куб.`
     gamestate.cardBtn.disabled = true
@@ -235,17 +241,17 @@ function warweariness(gamestate)
         const roll = gamestate.roll()
         if (roll == 1) {
             gamestate.statusLabel.textContent = `Месопотамия.`
-            gamestate.allTracks.mesopotamia.advance()
+            gamestate.allTracks.mesopotamia.advance(true)
         } else if (roll == 2) {
             gamestate.statusLabel.textContent = `Синай.`
-            gamestate.allTracks.sinai.advance()
+            gamestate.allTracks.sinai.advance(true)
         } else if (roll <= 4) {
             gamestate.statusLabel.textContent = `Арабы.`
-            gamestate.allTracks.arab.advance()
+            gamestate.allTracks.arab.advance(true)
         } else {
             gamestate.statusLabel.textContent = `Салоника и Галиполи.`
-            gamestate.allTracks.salonika.advance()
-            gamestate.allTracks.galipoli.advance()
+            gamestate.allTracks.salonika.advance(true)
+            gamestate.allTracks.galipoli.advance(true)
         }
         rollBtn.disabled = true;
         gamestate.cardBtn.disabled = false;

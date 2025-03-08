@@ -148,7 +148,7 @@ class Track
     provisional()
     {
         this.imgpath= "sprite/caucasus_provisional.png";
-        this.provisional = true;
+        this.isProvisional = true;
         this.counterDiv.childNodes[0].src = this.imgpath;
         this.setStrength(this.strength);
     }
@@ -186,7 +186,7 @@ class Track
         }
         if (this.currentPos >= this.spaces.length)
         {
-            window.alert("Османская империя пала...")
+            gameState.lose();
             return
         }
 
@@ -210,7 +210,8 @@ class Track
 
     setStrength(newStr)
     {
-        if (this.provisional) newStr--;
+        if (!this.counterDiv) return;
+        if (this.isProvisional) newStr--;
         this.strength = newStr
         this.counterDiv.childNodes[1].textContent = newStr
     }
@@ -292,7 +293,14 @@ const gameState =
     
     lose: () => {
         window.alert("Османская Империя пала...");
+        window.location.reload();
     },
+
+    win: () => {
+        window.alert("Османская Империя устояла!");
+        window.location.reload();
+    },
+
     pipelineBuilt: false,
     intelligenceAllowed : () => {intelBtn.style.display = 'inline-block';},
     statusLabel: statusLabel,
@@ -339,7 +347,7 @@ function start()
    gameState.deck.push(...sunriseDeck)
    
    shuffle(gameState.deck)
-   gameState.deck.push(duskDeck[2])
+
    gameloop()
 }
 
@@ -347,6 +355,8 @@ function changeMorale(delta)
 {
     morale += delta;
     moraleLabel.textContent = `Мораль: ${morale}`;
+    if (morale < -3)
+        gameState.lose();
 }
 
 function showTrack(name)
@@ -439,6 +449,9 @@ function drawcard()
 {
     
     card = gameState.deck.pop()
+
+    if (!card)
+        gameState.win();
 
 
     console.log(`Drawn ${card.name}`)
@@ -786,18 +799,18 @@ function yesnoPrompt(prompt, yesFun, noFun)
 
     yesBtn.style.display = 'inline-block'
     yesBtn.onclick = () => {
-        yesFun();
         cardBtn.disabled = false
         yesBtn.style.display = 'none'
         noBtn.style.display = 'none'
+        yesFun();
     }
 
     noBtn.style.display = 'inline-block'
     noBtn.onclick = () => {
-        noFun();
         cardBtn.disabled = false
         yesBtn.style.display = 'none'
         noBtn.style.display = 'none'
+        noFun();
     }
 }
 
