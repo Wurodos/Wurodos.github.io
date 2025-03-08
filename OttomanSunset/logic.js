@@ -184,7 +184,7 @@ class Track
             else if (this.name == "arab" && this.currentPos == 4 && allTracks.sinai.currentPos >= 4) {}
             else changeMorale(-1)
         }
-        if (this.currentPos >= this.spaces.length)
+        if (this.currentPos >= this.spaces.length - 1)
         {
             gameState.lose();
             return
@@ -223,14 +223,16 @@ const allTracks = {
         {x:1360,y:452,vp:false},
         {x:1235,y:428,vp:false},
         {x:1120,y:422,vp:true},
-        {x:995,y:410,vp:true}
+        {x:995,y:410,vp:true},
+        {x:695,y:247,vp:false}
     ]),
     caucasus: new Track("caucasus", 2, [
         {x:1378,y:185,vp:false},
         {x:1255,y:259,vp:false},
         {x:1114,y:285,vp:false},
         {x:977,y:269,vp:true},
-        {x:841,y:263,vp:true}
+        {x:841,y:263,vp:true},
+        {x:695,y:247,vp:false}
     ]),
     sinai: new Track("sinai", 3,[
         {x:500,y:910,vp:false},
@@ -238,19 +240,22 @@ const allTracks = {
         {x:769,y:793,vp:false},
         {x:843,y:667,vp:true},
         {x:819,y:534,vp:true},
-        {x:753,y:394,vp:false}
+        {x:753,y:394,vp:false},
+        {x:695,y:247,vp:false}
     ]),
     galipoli: new Track("galipoli", 2,[
         {x:442,y:673,vp:false},
         {x:526,y:567,vp:false},
         {x:593,y:460,vp:true},
-        {x:636,y:351,vp:false}
+        {x:636,y:351,vp:false},
+        {x:695,y:247,vp:false}
     ]),
     salonika: new Track("salonika", 2,[
         {x:181,y:430,vp:false},
         {x:248,y:278,vp:false},
         {x:381,y:181,vp:true},
-        {x:508,y:208,vp:false}
+        {x:508,y:208,vp:false},
+        {x:695,y:247,vp:false}
     ]),
     arab: new Track("arab", 2,[
         {x:1374,y:854,vp:false},
@@ -258,7 +263,8 @@ const allTracks = {
         {x:1079,y:804,vp:false},
         {x:986,y:653,vp:false},
         {x:919,y:534,vp:true},
-        {x:853,y:394,vp:false}
+        {x:853,y:394,vp:false},
+        {x:695,y:247,vp:false}
     ])
 }
 
